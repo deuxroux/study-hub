@@ -1,0 +1,30 @@
+<nav class="navbar navbar-expand-md sticky-top flex-column">
+    <div class="w-100 d-flex">
+      <div class="navbar-header" id="header">
+        <img src='https://upload.wikimedia.org/wikipedia/commons/8/87/Light_Bulb_or_Idea_Flat_Icon_Vector.svg ' id="logo"  alt="lightbulb logo" width="50px" height="75px">
+        <h1 id="application_title">StudyHub</h2>
+      </div>
+    </div>
+  
+    <div class="w-100 d-flex">
+     <ul class="navbar-nav mr-auto" id="navigation">
+        <li class="nav-item active"> <a class="nav-link" href="/">Home </a> </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item active">
+          <a class="nav-link" href="#"> Welcome, {{ user.username }}!</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="logout/"> Log Out</a>
+        </li>
+        {% else %}        
+        <li class="nav-item active">
+          <a class="nav-link" href="/register/"> Register</a>
+        </li>
+        <li class="nav-item active">
+        <a class="nav-link" href="/login/"> Log In </a>
+        </li>
+        {% endif %}
+     </ul>
+     </div>
+</nav>
+  
