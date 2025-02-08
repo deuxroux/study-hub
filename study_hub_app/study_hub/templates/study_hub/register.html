@@ -1,0 +1,47 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+        <h1>Register</h1>
+
+        {% if registered %}
+        <strong>Thanks for Registering! Please access your account by <a href="/login/"> Logging In </a></strong>
+        {% else %}
+        <strong>register here</strong><br />
+
+        <!-- display if there are form errors: -->
+        {% if user_form.errors or profile_form.errors %}
+        {% if user_form.errors %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Please correct the following errors:</strong>
+            {% for field in user_form %}
+              {% if field.errors %}
+                <br>
+                {{ field.label }}: {{ field.errors|striptags }}
+              {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if profile_form.errors %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Please correct the following profile errors:</strong>
+            {% for field in profile_form %}
+              {% if field.errors %}
+                {{ field.label }}: {{ field.errors|striptags }}
+              {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <form id="user_form" method="post" action="/register/"
+                enctype="multipart/form-data">
+
+            {% csrf_token %}
+            {{ user_form.as_p }}
+            {{ profile_form.as_p }}
+      
+            <input type="submit" name="submit" value="Register" />
+        </form>
+        {% endif %}
+{% endblock %}

@@ -1,7 +1,7 @@
 #general model imports
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator #todo: delete if not useful
 
 #notifs imports
 from django.db.models.signals import post_save
@@ -11,11 +11,12 @@ class User(AbstractUser):
     # start with default user model but with an field "is_teacher field" to distingursh either way
     is_teacher = models.BooleanField(default=False)
 
+    #had to add in order to debug
     groups = models.ManyToManyField(
         Group,
         verbose_name='groups',
         blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', #TO DO Delete
+        help_text='which group the usres belong to', #TO DO Delete
         related_name="study_hub_user_set",  # Custom related_name
         related_query_name="user",
     )
