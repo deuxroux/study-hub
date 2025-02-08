@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'study_hub.apps.StudyHubConfig',
+    'rest_framework',
+    'bootstrap4',
 ]
 
 MIDDLEWARE = [

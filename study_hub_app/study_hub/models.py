@@ -1,6 +1,6 @@
 #general model imports
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 #notifs imports
@@ -11,6 +11,22 @@ class User(AbstractUser):
     # start with default user model but with an field "is_teacher field" to distingursh either way
     is_teacher = models.BooleanField(default=False)
 
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', #TO DO Delete
+        related_name="study_hub_user_set",  # Custom related_name
+        related_query_name="user",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.', #TO DO Delete
+        related_name="study_hub_user_set",  # Custom related_name
+        related_query_name="user",
+    )
 
 class Course(models.Model):
     title = models.CharField(max_length=255)

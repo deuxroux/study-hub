@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Source+Sans+3:wght@200..900&display=swap');
+
+body {
+    font-family: Sans-Serif;
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+}
+
+h1,h2,h3, h4, h5 {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-family: 'Lora';
+}
+
+p, b, ul, form {
+    font-family: 'Source Sans 3'
+    
+}
+
+a { text-decoration: none; }
+
+
+.btn {
+    border-radius: 20px;
+    border-color:burlywood;
+    padding: 10px 20px;
+    background-color: #8cbd8c;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #768a76; 
+    border-color: white;
+}
+
+.card {
+    background-color: burlywood; 
+}
+  
+#application_title
+{
+    display: inline;
+}
+
+#logo{
+    height: 50px;
+    width: 50px
+}
+
+
+#navigation{
+    width: 100%;
+    background-color: #8cbd8c;
+    padding: 2px;
+}
+
+#application_title
+{
+    display: inline;
+    vertical-align: middle;
+}
+
+#logo{
+    vertical-align: middle;
+    height: 50px;
+    width: 50px
+}
+
+#header{
+    vertical-align: middle;
+    width: 100%;
+    background-color: #8cbd8c;
+}
+
+
+/* .nav_link {
+    font-size: smaller;
+} */
+
+.nav-link {
+    font-size:smaller;
+    color: black;
+}
+
+.nav-link:hover {
+    color: white;
+}
+
+.warning-text{
+    color:red;
+    font-style: italic;
+    font-size: small;
+}
+
+.navbar{
+padding: 0px;
+}
+
+#content{
+    padding-left: 10px;
+    float: left;
+}
+
+
+#footer{
+    padding-left: 10px;
+    padding-top: 25px;
+    width: 100%;
+    float: right;
+    border-top: 1px solid black;
+}
