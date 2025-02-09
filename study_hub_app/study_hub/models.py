@@ -14,17 +14,13 @@ class User(AbstractUser):
     #had to add in order to debug
     groups = models.ManyToManyField(
         Group,
-        verbose_name='groups',
         blank=True,
-        help_text='which group the usres belong to', #TO DO Delete
         related_name="study_hub_user_set",  # Custom related_name
         related_query_name="user",
     )
     user_permissions = models.ManyToManyField(
         Permission,
-        verbose_name='user permissions',
         blank=True,
-        help_text='Specific permissions for this user.', #TO DO Delete
         related_name="study_hub_user_set",  # Custom related_name
         related_query_name="user",
     )
@@ -47,7 +43,7 @@ class Enrollment(models.Model):
 
 
 class Feedback(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='feedbacks')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE,)
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
