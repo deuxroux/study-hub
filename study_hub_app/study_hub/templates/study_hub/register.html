@@ -7,7 +7,7 @@
         {% if registered %}
         <strong>Thanks for Registering! Please access your account by <a href="/login/"> Logging In </a></strong>
         {% else %}
-        <strong>register here</strong><br />
+        <strong>Registration for StudyHub</strong><br />
 
         <!-- display if there are form errors: -->
         {% if user_form.errors or profile_form.errors %}
@@ -34,8 +34,7 @@
         {% endif %}
         {% endif %}
 
-        <form id="user_form" method="post" action="/register/"
-                enctype="multipart/form-data">
+        <form id="user_form" method="post" action="/register/" enctype="multipart/form-data">
 
             {% csrf_token %}
             {{ user_form.as_p }}

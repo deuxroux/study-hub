@@ -26,9 +26,9 @@ def user_login(request):
                 login(request, user)
                 return HttpResponseRedirect('/')
             else:
-                return HttpResponse("Your account is disabled.")
+                return HttpResponse("Error") #TO DO figure out what error messge to put
         else:
-            return HttpResponse("Invalid login details supplied.")
+            return HttpResponse("Invalid password or username. Please check and try again.")
     else:
         return render(request, 'study_hub/login.html', )
 
@@ -37,18 +37,14 @@ def register(request):
     registered = False
 
     if request.method == 'POST':
-        user_form = UserForm(data=request.POST)
+        user_form = UserForm(request.POST,request.FILES) #deal with image too
         profile_form = UserProfileForm(data=request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
             user = user_form.save()
-
             profile = profile_form.save(commit=False)
             profile.user = user
-            # if 'is_teacher' in user_form.cleaned_data:
-            #     profile.is_teacher = request.DATA['is_teacher']
-            # profile.save()
-            # # return redirect('/login')
+
             registered = True
         else:
             print(user_form.errors, profile_form.errors)
