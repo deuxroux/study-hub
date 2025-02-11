@@ -1,7 +1,7 @@
 #general model imports
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.core.validators import MaxValueValidator, MinValueValidator #todo: delete if not useful
+# from django.core.validators import MaxValueValidator, MinValueValidator #todo: delete if not useful
 
 #notifs imports
 from django.db.models.signals import post_save
@@ -11,17 +11,21 @@ class User(AbstractUser):
     # start with default user model but with an field "is_teacher field" to distingursh either way
     is_teacher = models.BooleanField(default=False)
 
+    name = models.CharField(max_length = 255)
+    photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+
+
     #had to add in order to debug
     groups = models.ManyToManyField(
         Group,
         blank=True,
-        related_name="study_hub_user_set",  # Custom related_name
+        related_name="study_hub_user_set", 
         related_query_name="user",
     )
     user_permissions = models.ManyToManyField(
         Permission,
         blank=True,
-        related_name="study_hub_user_set",  # Custom related_name
+        related_name="study_hub_user_set",
         related_query_name="user",
     )
 
@@ -58,6 +62,8 @@ class CourseMaterial(models.Model):
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to='course_materials/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    assignment_due_date = models.DateTimeField(null=True, blank=True)
+
 
 class ChatMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
