@@ -40,7 +40,7 @@ class PostStatus(APIView):
 
         if serializer.is_valid():
             serializer.save(user = user)
-            return Response({'status': 'feedback posted successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'status': 'status posted successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
@@ -53,8 +53,8 @@ class SeeUserStatuses(APIView):
         return Response(serializedStatus.data)
     
 
-
 class GetCourseMaterials(APIView):
+    pagination_class = ListPagination
     def  get(self, request,pk, format=None):
         course = get_object_or_404(Course, pk= pk)
         courseMaterials = CourseMaterial.objects.filter(course=course)

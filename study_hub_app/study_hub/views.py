@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from .models import *
 from .forms import *
+from .api import *
 
 # Create your views here.
 def index(request):
@@ -32,6 +33,18 @@ def user_login(request):
     else:
         return render(request, 'study_hub/login.html', )
 
+def user_profile_page(request, username):
+    user = get_object_or_404(User, username = username)
+    statuses = StatusUpdate.objects.filter(user=user).order_by('-timestamp') #sort descending time
+
+    role = "Teacher" if user.is_teacher else "Student" #delineate the user status for display later
+
+    context = {
+        'user': user,
+        'role':role, 
+        'statuses': statuses,
+    }
+    return render(request, 'study_hub/user_profile.html', context)
 
 def register(request):
     registered = False

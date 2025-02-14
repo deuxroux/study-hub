@@ -7,6 +7,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
+    path('user/<str:username>/', views.user_profile_page, name='user_profile'),
+
 
     #API routes for debugging
     path('api/allCourses', api.AllCourses.as_view(), name = 'course_information'),
