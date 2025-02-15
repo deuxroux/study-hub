@@ -1,7 +1,11 @@
 {% extends "./base.html" %}
 {% block content %}
     <br />
-    <h1>Project Information </h1>
+    {% if user.is_authenticated %}
+    <h1>
+       Welcome, <a href="{% url 'user_profile' user.username %}"> {{ user.username }}</a>!
+    </h1>
+    {% endif %}
     <b>CM3035 Advanced Web Development Final Project</b><br>
     <b>Vineet Erasala</b> 
     <br><br>

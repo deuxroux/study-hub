@@ -1,0 +1,28 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ course.title }}</h1>
+    <p>Teacher: <a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></p>
+    <div>
+        {% if materials %}
+        <div>
+            <h2>Assignments</h2>
+            {% for material in materials %}
+            <div class="alert alert-info">
+                <h3> {{ material.title }}</h3>
+                <a href="{{ material.file.url }}" download>Download Material</a>
+                <small>uploaded: {{ material.uploaded_at|date:"D, d M Y H:i" }}</small>
+            </div>
+            {% empty %}
+            <p>There are no assignments </p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <div>
+        <a href="{% url 'leave_feedback' course.pk %}" class="btn btn-primary">Leave Feedback</a>
+    </div>
+</div>
+{% endblock %}

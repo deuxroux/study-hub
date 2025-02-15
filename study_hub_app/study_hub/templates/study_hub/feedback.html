@@ -1,0 +1,73 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Feedback for  <a href="/course/{{course.pk}}">{{ course.title }}</a></h2>
+    <div style="height: 300px; overflow-y: scroll;">
+        <div style="height: 300px; overflow-y: scroll;">
+            {% for feedback in feedbacks %}
+            <div class="alert alert-info">
+                <p>{{ feedback.content }}</p>
+                <small> -  <a href="/user/{{feedback.student}}">{{feedback.student}}</a>, {{ feedback.date_posted|date:"D, d M Y" }}</small>
+            </div>
+            {% empty %}
+            <p>No feedback for this course yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <h2>Leave Feedback for {{ course.title }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Your Rating:</label>
+            <div id="star-rating">
+                <i class="far fa-star" data-value="1"></i>
+                <i class="far fa-star" data-value="2"></i>
+                <i class="far fa-star" data-value="3"></i>
+                <i class="far fa-star" data-value="4"></i>
+                <i class="far fa-star" data-value="5"></i>
+            </div>
+
+            {{ form.rating }}
+        </div>
+        <div class="form-group">
+            {{ form.content.label_tag }}
+            {{ form.content }}
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+    </form>
+</div>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function(){
+    var stars = document.querySelectorAll('#star-rating .fa-star');
+
+    var ratingInput = document.querySelector('input[name = "rating"]');
+    stars.forEach(star =>{
+        star.addEventListener('click', function (){
+            const value = this.getAttribute('data-value');
+            ratingInput.value = value;
+            updateStars(value);
+        });
+    });
+
+    function updateStars(value){
+        stars.forEach(star => {
+            if (star.getAttribute('data-value') <= value) {
+                star.classList.remove('far');
+                star.classList.add('fas');
+            } else {
+                star.classList.add('far');
+                star.classList.remove('fas');
+            };
+        });
+    };
+});
+</script>
+
+
+{% endblock %}

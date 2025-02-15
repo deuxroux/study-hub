@@ -8,6 +8,9 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
     path('user/<str:username>/', views.user_profile_page, name='user_profile'),
+    path('course-catalog/', views.course_catalog, name = 'course_catalog'),
+    path('course/<int:pk>', views.course_view, name = 'course_view'),
+    path('feedback/<int:pk>', views.feedback, name='leave_feedback'),
 
 
     #API routes for debugging

@@ -13,18 +13,35 @@
         </div>
         <div class="col-md-8">
             <h2>{{ user.name }}</h2>
-            <p>@{{ user.username }} - {{ role }}</p>
+            <div>
+                <p>@{{ user.username }}</p>
+                <p  class="badge badge-secondary"> {{ role }} <p>
+            </div>
             <hr>
+
+
+            {% if is_own_profile %}
+            <h4>Post a Status</h4>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">Post</button>
+            </form>
+            <hr>
+            {% endif %}
+
             <h4>Status Updates</h4>
             <div class="status-updates" style="height: 300px; overflow-y: scroll;">
-                {% for status in statuses %}
-                <div class="alert alert-secondary" role="alert">
-                    <p>{{ status.content }}</p>
-                    <small>{{ status.timestamp|date:"D, d M Y H:i" }}</small>
-                </div>
-                {% empty %}
-                <p>No status updates yet.</p>
-                {% endfor %}
+                <div class="status-updates" style="height: 300px; overflow-y: scroll;">
+                    {% for status in statuses %}
+                    <div class="alert alert-info">
+                        <p>{{ status.content }}</p>
+                        <small>{{ status.timestamp|date:"D, d M Y H:i" }}</small>
+                    </div>
+                    {% empty %}
+                    <p>No status updates yet.</p>
+                    {% endfor %}
+                </div>    
             </div>
         </div>
     </div>

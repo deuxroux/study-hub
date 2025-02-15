@@ -18,8 +18,21 @@ class UserForm(UserCreationForm):
 
     
 class UserProfileForm(forms.ModelForm):
-    is_teacher = forms.BooleanField(label='Please check this box if you are an educator. Your Account may be frozen until verification can occur.', required=False)
+    is_teacher = forms.BooleanField(label='Please check this box if you are an educator.', required=False)
 
     class Meta:
         model = User
         fields = ('is_teacher', )
+
+class StatusUpdateForm(forms.Form):
+    content = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Whats on your mind?'}), label='Post a Status')
+    class Meta:
+        model = StatusUpdate
+        fields = ('content')
+
+class LeaveFeedbackForm(forms.ModelForm):
+    rating = forms.HiddenInput()
+    content =  forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'How is this Course?'}), label='Leave Feedback')
+    class Meta:
+        model = Feedback
+        fields = ('rating', 'content')

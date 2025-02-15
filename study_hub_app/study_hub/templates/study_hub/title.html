@@ -10,19 +10,29 @@
      <ul class="navbar-nav mr-auto" id="navigation">
         <li class="nav-item active"> <a class="nav-link" href="/">Home </a> </li>
         {% if user.is_authenticated %}
+
+        {% if user.is_teacher %}
         <li class="nav-item active">
-          <a class="nav-link" href="#"> Welcome, {{ user.username }}!</a>
-        </li>
+        <a class="nav-link" href="/"> Add New Course </a>
         <li class="nav-item active">
-          <a class="nav-link" href="/logout/"> Log Out</a>
+        <a class="nav-link" href="/"> See Current Classes</a>
+        {% else %}
+        <li class="nav-item active">
+        <a class="nav-link" href="/"> My Learning</a>          
+        <li class="nav-item active">
+        <a class="nav-link" href="{% url 'course_catalog' %}"> See Course Catalog</a>          
+        {% endif %}
+        <li class="nav-item active">
+        <a class="nav-link" href="{% url 'logout' %}"> Log Out</a>
         </li>
         {% else %}        
         <li class="nav-item active">
-          <a class="nav-link" href="/register/"> Register</a>
+          <a class="nav-link" href="{% url 'register' %}"> Register</a>
         </li>
         <li class="nav-item active">
-        <a class="nav-link" href="/login/"> Log In </a>
+        <a class="nav-link" href="{% url 'login' %}"> Log In </a>
         </li>
+
         {% endif %}
      </ul>
      </div>
