@@ -1,0 +1,33 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class = "container mt-4 mb-4">
+    <div class = "row">
+        <div class="col-md-12">
+            <h1>All Courses</h1>
+            <table class = "table">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th>Teacher</th>
+                        <th>Next Assignment</th>
+                        <th>Assignment Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in user_courses %}
+                    <tr>
+                        <td><a href="/course/{{course.pk}}">{{ course.title }}</a></td>
+                        <td><a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></td>
+                        <td> {{ course.latest_assignment|default:"No Active Assignments" }} </td>
+                        <td> {{ course.assignment_due|default:"--" }} </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

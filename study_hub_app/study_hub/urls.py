@@ -10,8 +10,10 @@ urlpatterns = [
     path('user/<str:username>/', views.user_profile_page, name='user_profile'),
     path('course-catalog/', views.course_catalog, name = 'course_catalog'),
     path('course/<int:pk>', views.course_view, name = 'course_view'),
-    path('feedback/<int:pk>', views.feedback, name='leave_feedback'),
-
+    path('feedback/<int:pk>', views.feedback_view, name='leave_feedback'),
+    path('enroll/<int:pk>', views.enroll_in_course, name='enroll_in_course'),
+    path('unenroll/<int:pk>', views.unenroll_from_course, name='unenroll_from_course'),
+    path('my-learning/', views.my_learning_view, name = 'my_learning'),
 
     #API routes for debugging
     path('api/allCourses', api.AllCourses.as_view(), name = 'course_information'),

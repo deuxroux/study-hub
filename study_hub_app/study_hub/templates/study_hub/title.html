@@ -10,28 +10,18 @@
      <ul class="navbar-nav mr-auto" id="navigation">
         <li class="nav-item active"> <a class="nav-link" href="/">Home </a> </li>
         {% if user.is_authenticated %}
-
         {% if user.is_teacher %}
-        <li class="nav-item active">
-        <a class="nav-link" href="/"> Add New Course </a>
-        <li class="nav-item active">
-        <a class="nav-link" href="/"> See Current Classes</a>
+        <li class="nav-item active"> <a class="nav-link" href="/"> Add New Course </a></li>
+        <li class="nav-item active"> <a class="nav-link" href="/"> See Current Classes</a></li>
         {% else %}
-        <li class="nav-item active">
-        <a class="nav-link" href="/"> My Learning</a>          
-        <li class="nav-item active">
-        <a class="nav-link" href="{% url 'course_catalog' %}"> See Course Catalog</a>          
+        <li class="nav-item active"> <a class="nav-link" href="{% url 'my_learning' %}"> My Learning</a> </li>         
+        <li class="nav-item active"> <a class="nav-link" href="{% url 'course_catalog' %}"> See Course Catalog</a> </li>         
         {% endif %}
-        <li class="nav-item active">
-        <a class="nav-link" href="{% url 'logout' %}"> Log Out</a>
-        </li>
+        <li class="nav-item active"><a class="nav-link" href="{% url 'user_profile' user.username %}"> My Profile</a></li>
+        <li class="nav-item active"> <a class="nav-link" href="{% url 'logout' %}"> Log Out</a></li>
         {% else %}        
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'register' %}"> Register</a>
-        </li>
-        <li class="nav-item active">
-        <a class="nav-link" href="{% url 'login' %}"> Log In </a>
-        </li>
+        <li class="nav-item active"> <a class="nav-link" href="{% url 'register' %}"> Register</a></li>
+        <li class="nav-item active"> <a class="nav-link" href="{% url 'login' %}"> Log In </a></li>
 
         {% endif %}
      </ul>

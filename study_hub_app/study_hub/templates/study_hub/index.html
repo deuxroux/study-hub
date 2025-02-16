@@ -3,7 +3,7 @@
     <br />
     {% if user.is_authenticated %}
     <h1>
-       Welcome, <a href="{% url 'user_profile' user.username %}"> {{ user.username }}</a>!
+       Welcome, <a href="{% url 'user_profile' user.username %}"> {{ user.name }}</a>!
     </h1>
     {% endif %}
     <b>CM3035 Advanced Web Development Final Project</b><br>

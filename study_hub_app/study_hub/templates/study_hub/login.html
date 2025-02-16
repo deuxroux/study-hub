@@ -2,24 +2,25 @@
 {% load bootstrap4 %}
 
 {% block content %}
+<div class="mt-4 mb-4">
+    <h1>Login</h1>
 
-<h1>Login</h1>
+    {% if error %}
+        <div class = "alert alert-danger">
+            {{error }}
+        </div>
+    {% endif %}
+    <form id="login_form" method="post" action="/login/">
+    {% csrf_token %}
+    Username: <input type="text" name="username" value="" size="50" />
+    <br />
+    Password: <input type="password" name="password" value="" size="50" />
+    <br />
+    <input type="submit" class="btn btn-primary" value = "Submit"></input>
+    </form>
 
-{% if error %}
-    <div class = "alert alert-danger">
-        {{error }}
-    </div>
-{% endif %}
-<form id="login_form" method="post" action="/login/">
-{% csrf_token %}
-Username: <input type="text" name="username" value="" size="50" />
-<br />
-Password: <input type="password" name="password" value="" size="50" />
-<br />
-<input type="submit" class="btn btn-primary" value = "Submit"></input>
-</form>
-
-<strong>No Account? <a href="/register/">  Register Your StudyHub Account Here! </a></strong>
+    <strong>No Account? <a href="/register/">  Register Your StudyHub Account Here! </a></strong>
+</div>
 
 
 {% endblock %}

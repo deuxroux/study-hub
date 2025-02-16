@@ -16,6 +16,7 @@ class UserForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2', 'name', 'photo') #password 2 is defulat ofr password validation
 
+
     
 class UserProfileForm(forms.ModelForm):
     is_teacher = forms.BooleanField(label='Please check this box if you are an educator.', required=False)
