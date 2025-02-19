@@ -1,0 +1,41 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class= "container mt-4">
+    {% if not user_is_teacher %}
+    <p  class="badge badge-danger"> NOT YOUR COURSE <p>
+    {% elif user_is_teacher %}
+        <p  class="badge badge-success"> CURRENTLY TEACHING <p>
+        <form action="{% url 'course_material_upload' pk=course.pk}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Upload New Assignment To Course</button>
+        </form>
+    {% endif %}
+</div>
+<div class="container mt-4 mb-4">
+    <h1>{{ course.title }}</h1>
+    <p>Teacher: <a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></p>
+    {% if user_is_teacher %}
+    <div>
+        {% if materials %}
+        <div>
+            <h2>Your Posted Assignments</h2>
+            {% for material in materials %}
+            <div class="alert alert-info">
+                <h3> {{ material.title }}</h3>
+                <a href="{{ material.file.url }}" download>Download Material</a>
+                <small>uploaded: {{ material.uploaded_at|date:"D, d M Y H:i" }}</small>
+            </div>
+            {% empty %}
+            <p>There are no assignments </p>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <h2>Students Enrolled:</h2>
+</div>
+
+{% endblock %}

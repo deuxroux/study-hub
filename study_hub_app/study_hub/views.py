@@ -76,7 +76,6 @@ def user_login(request):
     return render(request, 'study_hub/login.html', context )
 
 @login_required
-
 def my_learning_view(request):
     user = request.user
 
@@ -87,6 +86,42 @@ def my_learning_view(request):
 
     context = {'user_courses': course_data}
     return render(request, 'study_hub/my_learning.html', context)
+
+@login_required
+def course_edit_view(request, pk):
+    #course data
+    course = get_object_or_404(Course, pk = pk)
+    materials = CourseMaterial.objects.filter(course=course).order_by('-uploaded_at')
+
+    user = request.user
+    user_is_teacher = Course.objects.filter(teacher=user, id=pk).exists()
+    #user_can_enroll = not user.is_teacher and not user_is_enrolled
+
+    context = {
+        'course': course,
+        'materials': materials,
+        'user_is_teacher': user_is_teacher,
+    }
+    return render(request, 'study_hub/course_edit.html', context)
+
+@login_required
+def course_material_upload(request, pk):
+    #course data
+    course = get_object_or_404(Course, pk = pk)
+
+    if request.method == 'POST':
+        form = UpdateCourseMaterial(request.POST, request.FILES)
+        if form.is_valid():
+            course_material = form.save(commit=False) #don't save until we deal with the date time issue
+            course_material.assignment_due_Date = form.cleaned_data.get('assignment_due_datetime')
+            course_material.course = course
+            course_material.save()
+            return redirect(course_edit_view, pk = course.pk)
+    else:
+        form = UpdateCourseMaterial()
+
+    return render(request, 'study_hub/course_material_upload.html', {'form':form, 'course':course})
+
 
 @login_required
 def course_view(request, pk):

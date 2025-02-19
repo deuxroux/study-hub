@@ -14,6 +14,8 @@ urlpatterns = [
     path('enroll/<int:pk>', views.enroll_in_course, name='enroll_in_course'),
     path('unenroll/<int:pk>', views.unenroll_from_course, name='unenroll_from_course'),
     path('my-learning/', views.my_learning_view, name = 'my_learning'),
+    path('edit-course/<int:pk>', views.course_edit_view, name = 'course_edit_view'),
+    path('add-course-material/<int:pk>', views.course_material_upload, name = 'course_material_upload'),
 
     #API routes for debugging
     path('api/allCourses', api.AllCourses.as_view(), name = 'course_information'),

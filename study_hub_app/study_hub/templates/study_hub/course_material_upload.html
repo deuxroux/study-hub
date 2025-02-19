@@ -1,0 +1,15 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class="container m-4">
+    <h1>Upload New Assignment</h1>
+    <p>Fill in the details below to upload a new assignment.</p>
+    <form action="{% url 'course_material_upload' pk=course.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+
+        <button type="submit" class="btn btn-primary">Upload Assignment</button>
+    </form>
+</div>
+{% endblock %}
