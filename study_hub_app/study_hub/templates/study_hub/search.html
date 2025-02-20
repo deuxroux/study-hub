@@ -1,0 +1,42 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class="container m-4">
+    {% if user.is_teacher %}
+    <h1>Search for a User</h1>
+    <p>Fill in the details below to find a colleague or student</p>
+    <form action="{% url 'search_users' %}" method="get">
+        <input type="text" name="query" value="{{ query }}" placeholder="Name">
+        <select name="role">
+            <option value="all" selected >All</option>
+            <option value="teacher" >Teachers</option>
+            <option value="student" >Students</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if search_return %}
+<div class = "container m-4">
+<ul>
+    <div class ="container m-1">
+        <div class="status-updates" style="height: 300px; overflow-y: scroll;">
+            <div class="status-updates" style="height: 300px; overflow-y: scroll;">
+                {% for user in search_return %}
+                <div class="alert alert-info">
+
+                    <p><a href="/user/{{user.username}}">@{{ user.username }}</a></p>
+                    <small>{{ user.name }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</ul>
+{% else %}
+<p>no users could be found. Check the query and try again</p>
+</div>
+{% endif %}
+{% endblock %}

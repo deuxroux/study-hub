@@ -13,7 +13,7 @@
         {% if user.is_teacher %}
         <li class="nav-item active"> <a class="nav-link" href="{% url 'add_new_course' %}"> Add New Course </a></li>
         <li class="nav-item active"> <a class="nav-link" href="{% url 'my_teaching' %}"> My Teaching</a></li>
-        <li class="nav-item active"> <a class="nav-link" href="/">Search</a></li>
+        <li class="nav-item active"> <a class="nav-link" href="{% url 'search_users' %}">Search</a></li>
         {% else %}
         <li class="nav-item active"> <a class="nav-link" href="{% url 'my_learning' %}"> My Learning</a> </li>         
         <li class="nav-item active"> <a class="nav-link" href="{% url 'course_catalog' %}">Course Catalog</a> </li>         

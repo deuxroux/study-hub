@@ -2,35 +2,15 @@
 {% load bootstrap4 %}
 
 {% block content %}
-<div class = "container mt-4 mb-4">
-    <div class = "row">
-        <div class="col-md-12">
-            <h1>My Teaching</h1>
-            <h3>All Active Courses</h3>
-            <table class = "table">
-                <thead>
-                    <tr>
-                        <th>Course Name</th>
-                        <th>Students Enrolled</th>
-                        <th>Average Rating</th>
-                        <th>Next Assignment</th>
-                        <th>Assignment Due Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for course in user_courses %}
-                    <tr>
-                        <td><a href="{% url 'course_edit_view' pk=course.pk %}">{{ course.title }}</a></td>
-                        <td>{{ course.num_students }}</td>
-                        <td>{{ course.avg_rating|default:"Not rated yet"|floatformat:1 }}</td>
-                        <td> {{ course.latest_assignment|default:"No Active Assignments" }} </td>
-                        <td> {{ course.assignment_due|default:"--" }} </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div class="container m-4">
+    {% if user_is_teacher %}
+    <h1>Create New Course</h1>
+    <p>Fill in the details below to upload a new course.</p>
+    <form action="{% url 'add_new_course' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Create New Course</button>
+    </form>
+    {% endif %}
 </div>
-
 {% endblock %}

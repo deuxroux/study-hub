@@ -18,6 +18,7 @@ urlpatterns = [
     path('edit-course/<int:pk>/', views.course_edit_view, name = 'course_edit_view'),
     path('add-course-material/<int:pk>/', views.course_material_upload, name = 'course_material_upload'),
     path('add-new-course/', views.add_new_course, name = 'add_new_course'),
+    path('search/', views.search_users, name='search_users'),
 
     #API routes for debugging
     path('api/allCourses', api.AllCourses.as_view(), name = 'course_information'),

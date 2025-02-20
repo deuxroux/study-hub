@@ -159,6 +159,33 @@ def course_material_upload(request, pk):
 
 
 @login_required
+def search_users(request):
+    user = request.user
+    if not user.is_teacher:
+        return HttpResponseForbidden('You are not authorized to search for users.')
+    
+    query = request.GET.get('query', '')
+    filter = request.GET.get('role', 'all')
+    
+    if filter == 'teacher':
+        users = User.objects.filter(is_teacher=True, name__icontains=query) #search for only teachers by name
+    elif filter == 'student':
+        users = User.objects.filter(is_teacher=False, name__icontains=query) #search for only students by name
+    else:  # Show all types of roles 
+        users = User.objects.filter(name__icontains=query)
+    # print(users)
+
+    #TODO add logic for a photo too
+    context = {
+        'search_return':users,
+        'query':query,
+        'filter': filter,
+        'user': user
+    }
+    return render(request, 'study_hub/search.html', context)
+
+
+@login_required
 def course_view(request, pk):
     #course data
     course = get_object_or_404(Course, pk = pk)
@@ -257,3 +284,4 @@ def feedback_view(request,pk):
     context = {'form':form, 'course':course, 'feedbacks': prev_feedback}
 
     return render(request, 'study_hub/feedback.html', context)
+
