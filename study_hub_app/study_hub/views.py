@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count, Max
+from django.http import HttpResponseForbidden
 from django.utils.timezone import now
 from .models import *
 from .forms import *
@@ -88,19 +89,53 @@ def my_learning_view(request):
     return render(request, 'study_hub/my_learning.html', context)
 
 @login_required
+def my_teaching_view(request):
+    user = request.user
+
+    course_data = Course.objects.filter(teacher=user).annotate(
+        num_students=Count('students', distinct=True), #distinct must be true to avoid duplicates across other models during join
+        avg_rating=Avg('feedback__rating'),
+        latest_assignment=Max('materials__title', filter=models.Q(materials__assignment_due_date__gte=now())), #perform a query for the assignment with the nearest due date
+        assignment_due=Max('materials__assignment_due_date', filter=models.Q(materials__assignment_due_date__gte=now()))
+    ).order_by('title')
+
+    context = {'user_courses': course_data}
+    return render(request, 'study_hub/my_teaching.html', context)
+
+@login_required
+def add_new_course(request):
+    user = request.user
+    if not user.is_teacher:
+        return HttpResponseForbidden('You are not authorized to create new courses.')
+    
+    if request.method =='POST':
+        form = CreateCourse(request.POST)
+        if form.is_valid():
+            new_course=form.save(commit=False)
+            new_course.teacher=user
+            new_course.save()
+            return redirect(my_teaching_view)
+    else:
+        form=CreateCourse()
+    
+    return render(request, 'study_hub/new_course.html', {'form':form, 'user_is_teacher': user.is_teacher})
+
+
+@login_required
 def course_edit_view(request, pk):
     #course data
     course = get_object_or_404(Course, pk = pk)
     materials = CourseMaterial.objects.filter(course=course).order_by('-uploaded_at')
+    enrolled_students = User.objects.filter(enrollment__course=course).distinct()
 
     user = request.user
     user_is_teacher = Course.objects.filter(teacher=user, id=pk).exists()
-    #user_can_enroll = not user.is_teacher and not user_is_enrolled
 
     context = {
         'course': course,
         'materials': materials,
         'user_is_teacher': user_is_teacher,
+        'enrolled_students': enrolled_students
     }
     return render(request, 'study_hub/course_edit.html', context)
 
@@ -129,15 +164,20 @@ def course_view(request, pk):
     course = get_object_or_404(Course, pk = pk)
     # course materials
     materials = CourseMaterial.objects.filter(course=course).order_by('-uploaded_at')
+
+
     user = request.user
     user_is_enrolled = Enrollment.objects.filter(student=user, course=course).exists()
     user_can_enroll = not user.is_teacher and not user_is_enrolled
+    enrolled_students = User.objects.filter(enrollment__course=course).distinct()
 
     context = {
         'course': course,
         'materials': materials,
         'user_is_enrolled': user_is_enrolled,
-        'user_can_enroll': user_can_enroll
+        'user_can_enroll': user_can_enroll,
+        'enrolled_students': enrolled_students,
+        'user':user
     }
     return render(request, 'study_hub/course_detail.html', context)
 
@@ -152,13 +192,21 @@ def enroll_in_course(request, pk):
         return redirect(course_view, pk = course.pk)
 
 @login_required
-def unenroll_from_course(request, pk):
+def unenroll_from_course(request, pk, user_id):
+    is_teacher = False
     course = get_object_or_404(Course, pk= pk)
-    user = request.user
-    Enrollment.objects.filter(student= user, course= course).delete() #TODO does this logic handle the case that a user is not enrolled?
+    if user_id == request.user.id or request.user.is_teacher:
+        user = get_object_or_404(User, id =user_id)
+        if request.user.is_teacher:
+            is_teacher = True
+        Enrollment.objects.filter(student= user, course= course).delete() #TODO does this logic handle the case that a user is not enrolled?
+    else:
+        return redirect(index) #TODO figure out how to raise an error... this clauses is just to prevent someone trying to unenroll manually. 
     
-    return redirect(course_view, pk = course.pk)
-
+    if is_teacher:
+        return redirect(course_edit_view, pk = course.pk)
+    else:
+        return redirect(course_view, pk = course.pk)
 
 @login_required
 def user_profile_page(request, username):

@@ -72,4 +72,4 @@ class CreateCourse(forms.ModelForm):
     description =  forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describe the course in a few sentences'}), label='Description')
     class Meta:
         model = Course
-        fields = ('title', 'description', 'teacher') #TODO is teacher required based on how this is accessed? 
+        fields = ('title', 'description') #TODO is teacher required based on how this is accessed? 

@@ -3,23 +3,23 @@
 
 {% block content %}
 <div class= "container mt-4">
+    <h1>{{ course.title }}</h1>
+    <p>Teacher: <a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></p>
     {% if user_can_enroll %}
-    <p  class="badge badge-danger"> NOT ENROLLED <p>
-    <form action="{% url 'enroll_in_course' course.pk %}" method="post">
+    <p  class="badge badge-danger"> NOT ENROLLED </p>
+    <form action="{% url 'enroll_in_course' pk=course.pk%}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">Enroll in Course</button>
     </form>
     {% elif user_is_enrolled %}
-        <p  class="badge badge-success"> CURRENTLY ENROLLED <p>
-        <form action="{% url 'unenroll_from_course' course.pk %}" method="post">
+        <p  class="badge badge-success"> CURRENTLY ENROLLED </p>
+        <form action="{% url 'unenroll_from_course' pk=course.pk user_id=user.id %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn-danger">Unenroll from Course</button>
         </form>
     {% endif %}
 </div>
 <div class="container mt-4 mb-4">
-    <h1>{{ course.title }}</h1>
-    <p>Teacher: <a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></p>
     {% if user_is_enrolled %}
     <div>
         {% if materials %}
@@ -46,7 +46,5 @@
     </div>
     {% endif %}
 </div>
-
-
 
 {% endblock %}

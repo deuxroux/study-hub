@@ -3,6 +3,8 @@
 
 {% block content %}
 <div class= "container mt-4">
+    <h1>{{ course.title }}</h1>
+    <p>Teacher: <a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></p>
     {% if not user_is_teacher %}
     <p  class="badge badge-danger"> NOT YOUR COURSE <p>
     {% elif user_is_teacher %}
@@ -14,8 +16,6 @@
     {% endif %}
 </div>
 <div class="container mt-4 mb-4">
-    <h1>{{ course.title }}</h1>
-    <p>Teacher: <a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></p>
     {% if user_is_teacher %}
     <div>
         {% if materials %}
@@ -34,8 +34,33 @@
         {% endif %}
     </div>
     {% endif %}
-
+</div>
+<div class="container mt-4 mb-4">
     <h2>Students Enrolled:</h2>
+
+    <table class = "table">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>username</th>
+                <th>Block Student?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in enrolled_students %}
+            <tr>
+                <td>{{ student.name }}</a></td>
+                <td><a href="/user/{{student.username}}">{{ student.username }}</a></td>
+                <td>
+                    <form action="{% url 'unenroll_from_course' pk=course.pk user_id=student.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-danger">Block and Remove</button>
+                    </form> 
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 {% endblock %}

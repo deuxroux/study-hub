@@ -5,13 +5,14 @@
 <div class = "container mt-4 mb-4">
     <div class = "row">
         <div class="col-md-12">
-            <h1>My Learning</h1>
+            <h1>My Teaching</h1>
             <h3>All Active Courses</h3>
             <table class = "table">
                 <thead>
                     <tr>
                         <th>Course Name</th>
-                        <th>Teacher</th>
+                        <th>Students Enrolled</th>
+                        <th>Average Rating</th>
                         <th>Next Assignment</th>
                         <th>Assignment Due Date</th>
                     </tr>
@@ -19,8 +20,9 @@
                 <tbody>
                     {% for course in user_courses %}
                     <tr>
-                        <td><a href="/course/{{course.pk}}">{{ course.title }}</a></td>
-                        <td><a href="/user/{{course.teacher.username}}">{{ course.teacher.name }}</a></td>
+                        <td><a href="{% url 'course_edit_view' pk=course.pk %}">{{ course.title }}</a></td>
+                        <td>{{ course.num_students }}</td>
+                        <td>{{ course.avg_rating|default:"Not rated yet"|floatformat:1 }}</td>
                         <td> {{ course.latest_assignment|default:"No Active Assignments" }} </td>
                         <td> {{ course.assignment_due|default:"--" }} </td>
                     </tr>

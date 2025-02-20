@@ -1,0 +1,16 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class="container m-4">
+    {% if user_is_teacher %}
+    <h1>Create New Course</h1>
+    <p>Fill in the details below to upload a new course.</p>
+    <form action="{% url 'add_new_course' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Create New Course</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
