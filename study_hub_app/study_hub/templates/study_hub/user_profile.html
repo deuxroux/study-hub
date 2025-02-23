@@ -16,6 +16,12 @@
             <div>
                 <p>@{{ user.username }}</p>
                 <p  class="badge badge-secondary"> {{ role }} <p>
+                {% if is_own_profile %}
+                <a href = "{%url 'chat_with_user' username=user.username%}"><button type="button" class="btn btn-primary">Go to My Notes</button></a>
+                {% else %}
+                <a href = "{%url 'chat_with_user' username=user.username%}"><button type="button" class="btn btn-primary">Chat with {{user.name}}</button></a>
+                {% endif %}
+
             </div>
             <hr>
 

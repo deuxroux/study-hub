@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 from . import views
 from . import api
 
@@ -19,6 +19,8 @@ urlpatterns = [
     path('add-course-material/<int:pk>/', views.course_material_upload, name = 'course_material_upload'),
     path('add-new-course/', views.add_new_course, name = 'add_new_course'),
     path('search/', views.search_users, name='search_users'),
+
+    path('chat/<str:username>', views.chat_with_user, name='chat_with_user'),
 
     #API routes for debugging
     path('api/allCourses', api.AllCourses.as_view(), name = 'course_information'),

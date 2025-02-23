@@ -25,8 +25,6 @@ SECRET_KEY = "django-insecure-2obp0h(1rfu)5lds)6r)lxi3d%uork=*vevc6uoqdea^7g7u7-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -40,6 +38,7 @@ INSTALLED_APPS = [
     'study_hub.apps.StudyHubConfig',
     'rest_framework',
     'bootstrap4',
+    'channels',
 ]
 
 REST_FRAMEWORK = {
@@ -83,6 +82,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "study_hub_app.wsgi.application"
+ASGI_APPLICATION = "study_hub_app.asgi.application"
+
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+
 
 
 # Database
@@ -141,3 +146,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# code to provide config settings for django channel layers
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # default redis server location?
+        },
+    },
+}

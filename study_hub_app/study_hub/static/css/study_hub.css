@@ -99,6 +99,32 @@ a { text-decoration: none; }
 padding: 0px;
 }
 
+
+.chat-log {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+.chat-message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.chat-message p {
+    margin: 0;
+    padding: 0;
+}
+.chat-message.sender {
+    text-align: right;
+    background-color: #c6e5f8;
+}
+.chat-message.receiver {
+    text-align: left;
+    background-color: #eaeaea;
+}
+
 #content{
     padding-left: 10px;
     float: left;
@@ -112,3 +138,4 @@ padding: 0px;
     float: right;
     border-top: 1px solid black;
 }
+

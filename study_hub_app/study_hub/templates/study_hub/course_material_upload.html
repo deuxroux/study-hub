@@ -7,8 +7,7 @@
     <p>Fill in the details below to upload a new assignment.</p>
     <form action="{% url 'course_material_upload' pk=course.pk %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p}}
-
+        {% bootstrap_form form %}
         <button type="submit" class="btn btn-primary">Upload Assignment</button>
     </form>
 </div>

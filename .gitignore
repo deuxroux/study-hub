@@ -3,6 +3,7 @@
 *.log
 *.sql
 *.sqlite
+*.rdb
 
 #Cache#
 **/__pycache__/

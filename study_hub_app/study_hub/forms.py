@@ -43,7 +43,7 @@ class LeaveFeedbackForm(forms.ModelForm):
 class UpdateCourseMaterial(forms.ModelForm):
 
     title = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 1, 'placeholder': 'Brief Title of the Assignment'}), label='Assignment Title')
-    file = forms.FileField(widget = forms.ClearableFileInput,  label='File Upload')
+    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'class': 'form-control'}), label='File Upload', required=True)  #upload optional
 
     #forms do not have consolidated date time, so track separt3e
     assignment_due_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}), label='Assignment Due Date')

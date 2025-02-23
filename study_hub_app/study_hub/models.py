@@ -1,7 +1,7 @@
 #general model imports
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.core.validators import MaxValueValidator, MinValueValidator #todo: delete if not useful
+from django.core.validators import MaxValueValidator, MinValueValidator #used for star rating system validation
 
 #notifs imports
 from django.db.models.signals import post_save
@@ -76,13 +76,44 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"Message from {self.sender.username} to {self.recipient.username} at {self.timestamp}"
 
+class EnrollmentNotification(models.Model):
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrollment_notifications')
+    #add code to help debug
+    def __str__(self):
+        return f"new enrollment notification for {self.user.username} at {self.timestamp}"
+ 
+
+class NewMaterialNotification(models.Model):
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='material_notifications')
+    #add code to help debug
+    def __str__(self):
+        return f"Notification for new material, alerting: {self.user.username} at {self.timestamp}"
+
 # Notify teacher for student enroll
 @receiver(post_save, sender=Enrollment)
 def notify_teacher_on_enrollment(sender, instance, created, **kwargs):
     if created:
-        pass
+        message = f"{instance.student.username} has enrolled in your course '{instance.course.title}'."
+        EnrollmentNotification.objects.create(
+            message=message,
+            user=instance.course.teacher
+        )
 
 @receiver(post_save, sender=CourseMaterial)
 def notify_students_on_new_material(sender, instance, created, **kwargs):
     if created:
-        pass
+        students_to_notify = instance.course.students.all() #get all affected studentcs
+        message = f"There is a new assignment titled: {instance.title} posted in your course page-- {instance.course.title}. Please complete the assignment by {instance.assignment_due_date}.  Go to the class page to review."
+        
+        #push notification to each
+
+        for student in students_to_notify:
+            NewMaterialNotification.objects.create(
+                message=message,
+                user=student
+            )
+

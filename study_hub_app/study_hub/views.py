@@ -9,8 +9,22 @@ from .forms import *
 from .serializers import *
 
 # Create your views here.
+
 def index(request):
-    return render(request, 'study_hub/index.html')
+
+    notifications = []
+    role = ''
+
+    if request.user.is_authenticated:
+        user= request.user
+        if user.is_teacher:
+            notifications = EnrollmentNotification.objects.filter(user=user).order_by('-timestamp')
+            role = 'teacher'
+        else:
+            notifications = NewMaterialNotification.objects.filter(user=user).order_by('-timestamp')
+            role = 'student'
+    context = {'notifications':notifications, 'role': role}
+    return render(request, 'study_hub/index.html',context)
 
 def user_logout(request):
     logout(request)
@@ -142,13 +156,15 @@ def course_edit_view(request, pk):
 @login_required
 def course_material_upload(request, pk):
     #course data
-    course = get_object_or_404(Course, pk = pk)
+    course = get_object_or_404(Course, pk=pk)
 
     if request.method == 'POST':
         form = UpdateCourseMaterial(request.POST, request.FILES)
         if form.is_valid():
             course_material = form.save(commit=False) #don't save until we deal with the date time issue
-            course_material.assignment_due_Date = form.cleaned_data.get('assignment_due_datetime')
+            print("Combined datetime:", form.cleaned_data.get('assignment_due_datetime'))
+            course_material.assignment_due_date = form.cleaned_data.get('assignment_due_datetime')
+            print("Model datetime field before save:", course_material.assignment_due_date)
             course_material.course = course
             course_material.save()
             return redirect(course_edit_view, pk = course.pk)
@@ -161,9 +177,6 @@ def course_material_upload(request, pk):
 @login_required
 def search_users(request):
     user = request.user
-    if not user.is_teacher:
-        return HttpResponseForbidden('You are not authorized to search for users.')
-    
     query = request.GET.get('query', '')
     filter = request.GET.get('role', 'all')
     
@@ -284,4 +297,23 @@ def feedback_view(request,pk):
     context = {'form':form, 'course':course, 'feedbacks': prev_feedback}
 
     return render(request, 'study_hub/feedback.html', context)
+
+@login_required
+def chat_with_user(request, username):
+    user_to_message = get_object_or_404(User, username=username)
+    is_own_profile = request.user == user_to_message
+    chat_log = ChatMessage.objects.filter(
+        models.Q(sender=request.user, recipient = user_to_message) | models.Q(sender=user_to_message, recipient = request.user) #queries either user sending or receiving to this specific addressee
+    ).order_by('timestamp') #objects will populate in ascending timestamp order
+
+
+    print(chat_log)
+    context = {
+        'user_to_message':user_to_message,
+        'is_own_profile':is_own_profile,
+        'chat_log':chat_log,
+        'user':request.user
+    }
+
+    return render(request, 'study_hub/chat.html', context)
 

@@ -9,10 +9,9 @@
     <p  class="badge badge-danger"> NOT YOUR COURSE <p>
     {% elif user_is_teacher %}
         <p  class="badge badge-success"> CURRENTLY TEACHING <p>
-        <form action="{% url 'course_material_upload' pk=course.pk}" method="post">
-            {% csrf_token %}
+        <a href="{% url 'course_material_upload' pk=course.pk %}">
             <button type="submit" class="btn btn-primary">Upload New Assignment To Course</button>
-        </form>
+        </a>
     {% endif %}
 </div>
 <div class="container mt-4 mb-4">

@@ -1,8 +1,45 @@
 {% extends "./base.html" %}
 {% block content %}
     {% if user.is_authenticated %}
-    <h1 class="m-4">
-       Welcome, <a href="{% url 'user_profile' user.username %}"> {{ user.name }}</a>!
-    </h1>
+    <h1>
+        Welcome, <a href="{% url 'user_profile' user.username %}"> {{ user.name }}</a>!
+     </h1>
+     <hr>
+    <container>
+         <h2 class="mt-2 mb-2">Quick Links</h2>
+         <p><a href = "{% url 'user_profile' user.username %}">My Profile: </a> Access your homepage, including notebook and statuses.</p>
+         {% if role == 'teacher' %}
+         <p><a href = "{% url 'my_teaching' %}">My Classes: </a> View and edit the classes you are currently teaching.</p>
+         <p><a href = "{% url 'course_catalog' %}">All Courses: </a> See other courses offered on the platform.</p>
+        {% else %}
+        <p><a href = "{% url 'my_learning' %}">My Classes: </a> View your current enrolled classes and latest assignments.</p>
+        <p><a href = "{% url 'course_catalog' %}">All Courses: </a> Find and enroll in interesting courses.</p>
+        {% endif %}
+
+         <p><a href = "{% url 'search_users' %}">Search: </a> Find other StudyHub accounts, see their pages, and chat with them.</p>
+    </container>
+    <hr>
+    <container>
+         <h2>My Notifications </h2>
+         <div class="status-updates" style="height: 300px; overflow-y: scroll;">
+            <div class="status-updates" style="height: 300px; overflow-y: scroll;">
+                {% for notification in notifications %}
+                <div class="alert alert-info">
+                    <p>{{ notification.message }}</p>
+                    <small>{{ notification.timestamp|date:"D, d M Y H:i" }}</small>
+                </div>
+                {% empty %}
+                <p>No new notifications.</p>
+                {% endfor %}
+            </div>    
+        </div>
+    </container>
+    {% else %}
+    <container class = "m-4">
+        <h1>Welcome to Study Hub!</h1>
+        <p>Please <a href = "{% url 'login' %}">Login </a>to access your learning platform</p>
+         <h2>About</h2>
+         <p> Study Hub is an online learning platform connecting students and teachers. Enroll in courses that interest and challenge you to be your best. <a href = "{% url 'register' %}">Join Today</a> for free to begin your learning journey!</p>
+    </container>
     {% endif %}
 {% endblock %}

@@ -3,9 +3,12 @@
 
 {% block content %}
 <div class="container m-4">
-    {% if user.is_teacher %}
     <h1>Search for a User</h1>
+    {% if user.is_teacher %}
     <p>Fill in the details below to find a colleague or student</p>
+    {% else %}
+    <p>Fill in the details below to find a peer or teacher</p>
+    {% endif %}
     <form action="{% url 'search_users' %}" method="get">
         <input type="text" name="query" value="{{ query }}" placeholder="Name">
         <select name="role">
@@ -15,7 +18,6 @@
         </select>
         <button type="submit" class="btn btn-primary">Search</button>
     </form>
-    {% endif %}
 </div>
 
 {% if search_return %}
@@ -26,9 +28,15 @@
             <div class="status-updates" style="height: 300px; overflow-y: scroll;">
                 {% for user in search_return %}
                 <div class="alert alert-info">
+                    <p>{{ user.name }}</p>
+                    {% if user.is_teacher %}
+                    <p  class="badge badge-primary"> teacher <p>
+                    {% else %}
+                    <p  class="badge badge-secondary"> student <p>
+                    {% endif %}
+                    <small><a href="/user/{{user.username}}">@{{ user.username }}</a></small>
 
-                    <p><a href="/user/{{user.username}}">@{{ user.username }}</a></p>
-                    <small>{{ user.name }}</small>
+
                 </div>
                 {% endfor %}
             </div>

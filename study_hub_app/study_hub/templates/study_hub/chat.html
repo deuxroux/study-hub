@@ -1,0 +1,83 @@
+{% extends "./base.html" %}
+{% load bootstrap4 %}
+
+{% block content %}
+<div class="container m-4">
+    {% if is_own_profile %}
+    <h1>Your Notebook</h1>
+    <p>Post notes and to-dos here for yourself to look at later.</p>
+    {% else %}
+    <h1>Chat with {{ user_to_message.name }}</h1>
+    {% endif %}
+    <div id="chat-log" class="chat-log">
+        {% for chat in chat_log %}
+        <!-- Check if the message sender is the current user -->
+        {% if user.id == chat.sender.id %}
+        <div class="chat-message sender">
+            <p>{{ chat.message }}</p>
+            <small>-- You</small>
+        </div>
+        {% else %}
+        <div class="chat-message receiver">
+            <p>{{ chat.message }}</p>
+            <small>-- {{ chat.sender }}</small>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div><br>
+
+    <input id="chat-message-input" class="form-control" type="text" placeholder="Type a message...">
+    <button id="chat-message-submit" class="btn btn-primary mt-2">Send</button>
+</div>
+
+
+<script>
+    const userToMessagePK = "{{ user_to_message.id }}";
+    const currentUserID = "{{user.id}}";
+
+    const chatSocket = new WebSocket('ws://'+ window.location.host+ '/ws/chat/'+userToMessagePK+ '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const chatLogElementToUpdate = document.querySelector('#chat-log');
+        const messageElement = document.createElement('div'); // create a chat entity based on the user sending vs receiving
+        var messageSenderData = '';
+        var senderName ='You'
+
+        if(data.sender_id == currentUserID){
+            messageSenderData = 'sender';
+        }
+        else{
+            messageSenderData = 'receiver';
+            senderName="{{user_to_message.username}}";
+        } // denote if the sender is the same as the current user
+        console.log('message recieved from:' + messageSenderData);
+        messageElement.classList.add('chat-message', messageSenderData)
+        messageElement.innerHTML = `<p>${data.message}</p><small>--${senderName}</small>`; 
+        chatLogElementToUpdate.appendChild(messageElement);
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'sender_id': currentUserID,
+        }));
+        messageInputDom.value = '';
+    };
+</script>
+
+{% endblock %}
