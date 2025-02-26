@@ -18,7 +18,7 @@
         <li class="nav-item active"> <a class="nav-link" href="{% url 'course_catalog' %}">Course Catalog</a> </li>         
         {% endif %}
         <li class="nav-item active"> <a class="nav-link" href="{% url 'search_users' %}">Search</a></li>
-        <li class="nav-item active"><a class="nav-link" href="{% url 'user_profile' user.username %}">My Profile</a></li>
+        <li class="nav-item active"><a class="nav-link" href="{% url 'user_profile' user.username %}">My Homepage</a></li>
         <li class="nav-item active"> <a class="nav-link" href="{% url 'logout' %}"> Log Out</a></li>
         {% else %}        
         <li class="nav-item active"> <a class="nav-link" href="{% url 'register' %}"> Register</a></li>

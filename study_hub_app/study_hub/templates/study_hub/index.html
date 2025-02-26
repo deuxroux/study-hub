@@ -27,6 +27,7 @@
                 <div class="alert alert-info">
                     <p>{{ notification.message }}</p>
                     <small>{{ notification.timestamp|date:"D, d M Y H:i" }}</small>
+                    <a href="{% url 'delete_notification' notification.id %}" class="btn-danger btn-sm">Clear Notification</a>
                 </div>
                 {% empty %}
                 <p>No new notifications.</p>

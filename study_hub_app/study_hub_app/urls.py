@@ -24,4 +24,13 @@ from django.conf import settings
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include('study_hub.urls')),
+    path('apischema/', get_schema_view(
+        title= 'StudyHub REST API',
+        description = "API for interacting with Studyhub database",
+        version = "1.0"
+    ), name="openapi-schema"),
+    path('swaggerdocs/', TemplateView.as_view(
+        template_name='study_hub/swagger-docs.html',
+        extra_context={'schema_url': 'openapi-schema'}
+    ), name='swagger-ui')
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

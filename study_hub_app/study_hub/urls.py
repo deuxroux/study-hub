@@ -19,6 +19,7 @@ urlpatterns = [
     path('add-course-material/<int:pk>/', views.course_material_upload, name = 'course_material_upload'),
     path('add-new-course/', views.add_new_course, name = 'add_new_course'),
     path('search/', views.search_users, name='search_users'),
+    path('notifications/delete/<int:pk>/', views.delete_notification, name='delete_notification'),
 
     path('chat/<str:username>', views.chat_with_user, name='chat_with_user'),
 

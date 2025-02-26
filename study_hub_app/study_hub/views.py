@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count, Max
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 from django.utils.timezone import now
 from .models import *
 from .forms import *
@@ -25,6 +25,22 @@ def index(request):
             role = 'student'
     context = {'notifications':notifications, 'role': role}
     return render(request, 'study_hub/index.html',context)
+
+@login_required
+def delete_notification(request,pk):
+
+    try: 
+        notification = EnrollmentNotification.objects.get(id=pk, user=request.user) #clarify both so that we don't delete the wrong one
+    #try the other model if not present in enrollment notif
+    except EnrollmentNotification.DoesNotExist:
+        try:
+            notification = NewMaterialNotification.objects.get(id=pk, user=request.user)
+        except NewMaterialNotification.DoesNotExist:
+            raise Http404("Notification Not Found. Please go back and try again")
+
+    notification.delete()
+    
+    return redirect(index)
 
 def user_logout(request):
     logout(request)
