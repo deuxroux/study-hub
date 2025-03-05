@@ -11,14 +11,16 @@ from .serializers import *
 from rest_framework.decorators import api_view
 
 class ListPagination(PageNumberPagination):
-    page_size = 8
+    page_size = 8 #set consistent entries per page for large returns
 
+#see all courses
 class ViewCourseInformation(mixins.RetrieveModelMixin,
                     generics.GenericAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     pagination_class = ListPagination
 
+#add a single course
 class AddCourse(mixins.CreateModelMixin,
                         mixins.UpdateModelMixin,
                         generics.GenericAPIView):
@@ -28,6 +30,7 @@ class AddCourse(mixins.CreateModelMixin,
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
+#see all courses
 class AllCourses(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer 
@@ -38,6 +41,7 @@ class PostStatus(APIView):
         user = request.user
         serializer = StatusUpdateSerializer(data = request.data)
 
+        # some logic to ensure that all the details for the data post was correct
         if serializer.is_valid():
             serializer.save(user = user)
             return Response({'status': 'status posted successfully'}, status=status.HTTP_201_CREATED)
@@ -96,12 +100,13 @@ class ViewCourseFeedback(APIView):
         return Response(serializedFeedback.data)
     
 
-
+#enroll handles enrollment, logic for attempted repeat enroll, and unenrollment
 @api_view(['POST', 'DELETE'])
 def Enroll(request, pk):
     user = request.user
     course = get_object_or_404(Course, pk=pk)
 
+    #logic to manage an already enrolled entity
     if request.method == 'POST':
         enrollment = Enrollment.objects.get_or_create(student = user, course= course)
         if enrollment:
@@ -109,6 +114,7 @@ def Enroll(request, pk):
         else:
             return Response({'status': 'already enrolled'}, status=status.HTTP_200_OK)
     
+    #unenroll endpoint
     if request.method == 'DELETE':
         enrollment = Enrollment.objects.filter(student=user, course=course)
         if enrollment.exists():

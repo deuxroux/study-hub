@@ -8,27 +8,28 @@ from .models import *
 from .forms import *
 from .serializers import *
 
-# Create your views here.
-
+#index is home page-- has a view depending on if you're authenticated  and passes context object for html handling
 def index(request):
-
-    notifications = []
+    notifications = [] #specify the notifications to be passed
     role = ''
 
     if request.user.is_authenticated:
-        user= request.user
+        user= request.user #get the current logged in user details
         if user.is_teacher:
             notifications = EnrollmentNotification.objects.filter(user=user).order_by('-timestamp')
             role = 'teacher'
         else:
             notifications = NewMaterialNotification.objects.filter(user=user).order_by('-timestamp')
             role = 'student'
+    
+    #context objects return information relevant to html render
     context = {'notifications':notifications, 'role': role}
     return render(request, 'study_hub/index.html',context)
 
+#decorator for login requirement
 @login_required
+#function to delete notifications. 
 def delete_notification(request,pk):
-
     try: 
         notification = EnrollmentNotification.objects.get(id=pk, user=request.user) #clarify both so that we don't delete the wrong one
     #try the other model if not present in enrollment notif
@@ -38,8 +39,7 @@ def delete_notification(request,pk):
         except NewMaterialNotification.DoesNotExist:
             raise Http404("Notification Not Found. Please go back and try again")
 
-    notification.delete()
-    
+    notification.delete() #if found, delete
     return redirect(index)
 
 def user_logout(request):
@@ -60,10 +60,10 @@ def course_catalog(request):
     return render(request, 'study_hub/course_catalog.html', context)
 
 def register(request):
-    registered = False
+    registered = False #default unreqgisterd
 
     if request.method == 'POST':
-        user_form = UserForm(request.POST,request.FILES) #deal with image too
+        user_form = UserForm(request.POST,request.FILES) #request files deal with image too
         profile_form = UserProfileForm(data=request.POST)
 
         if user_form.is_valid() and profile_form.is_valid():
@@ -71,7 +71,6 @@ def register(request):
             user.is_teacher=profile_form.cleaned_data.get('is_teacher')
 
             #TODO image processing? 
-
             user.save()
 
             registered = True
@@ -87,11 +86,11 @@ def register(request):
 
 def user_login(request):
     context = {}
+    #retrieve login data that is entered
     if request.method == 'POST':
 
         username = request.POST.get('username')
         password = request.POST.get('password')
-
 
         user = authenticate(username=username, password=password)
 
@@ -110,6 +109,7 @@ def user_login(request):
 def my_learning_view(request):
     user = request.user
 
+    #perform a Q query to get related objects and latest assignments. use annotate as a join to only pull relevant data
     course_data = Course.objects.filter(students=user).annotate(
         latest_assignment=Max('materials__title', filter=models.Q(materials__assignment_due_date__gte=now())), #perform a query for the assignment with the nearest due date
         assignment_due=Max('materials__assignment_due_date', filter=models.Q(materials__assignment_due_date__gte=now()))
@@ -118,6 +118,7 @@ def my_learning_view(request):
     context = {'user_courses': course_data}
     return render(request, 'study_hub/my_learning.html', context)
 
+#do the same, but for teacher view
 @login_required
 def my_teaching_view(request):
     user = request.user
@@ -136,7 +137,7 @@ def my_teaching_view(request):
 def add_new_course(request):
     user = request.user
     if not user.is_teacher:
-        return HttpResponseForbidden('You are not authorized to create new courses.')
+        return HttpResponseForbidden('You are not authorized to create new courses.') #only allow teachers to create a new course
     
     if request.method =='POST':
         form = CreateCourse(request.POST)
@@ -155,7 +156,7 @@ def add_new_course(request):
 def course_edit_view(request, pk):
     #course data
     course = get_object_or_404(Course, pk = pk)
-    materials = CourseMaterial.objects.filter(course=course).order_by('-uploaded_at')
+    materials = CourseMaterial.objects.filter(course=course).order_by('-uploaded_at') #reverse order for upload time
     enrolled_students = User.objects.filter(enrollment__course=course).distinct()
 
     user = request.user
@@ -183,7 +184,7 @@ def course_material_upload(request, pk):
             print("Model datetime field before save:", course_material.assignment_due_date)
             course_material.course = course
             course_material.save()
-            return redirect(course_edit_view, pk = course.pk)
+            return redirect(course_edit_view, pk = course.pk) #go back to course edit view for this page, should populate with new material.
     else:
         form = UpdateCourseMaterial()
 
@@ -193,7 +194,7 @@ def course_material_upload(request, pk):
 @login_required
 def search_users(request):
     user = request.user
-    query = request.GET.get('query', '')
+    query = request.GET.get('query', '') #start with a blank query which should return all users
     filter = request.GET.get('role', 'all')
     
     if filter == 'teacher':
@@ -227,6 +228,7 @@ def course_view(request, pk):
     user_can_enroll = not user.is_teacher and not user_is_enrolled
     enrolled_students = User.objects.filter(enrollment__course=course).distinct()
 
+    #context object should contain all elements required for the table in the html to populate and appropriate flags for enrollment state
     context = {
         'course': course,
         'materials': materials,
@@ -295,6 +297,7 @@ def user_profile_page(request, username):
     }
     return render(request, 'study_hub/user_profile.html', context)
 
+#specific view to leave ne feedback using form
 @login_required
 def feedback_view(request,pk):
     course = get_object_or_404(Course, pk = pk)
@@ -314,16 +317,15 @@ def feedback_view(request,pk):
 
     return render(request, 'study_hub/feedback.html', context)
 
+#ASGI chat application view for persistence and saving chat data to pull up later
 @login_required
 def chat_with_user(request, username):
     user_to_message = get_object_or_404(User, username=username)
     is_own_profile = request.user == user_to_message
     chat_log = ChatMessage.objects.filter(
         models.Q(sender=request.user, recipient = user_to_message) | models.Q(sender=user_to_message, recipient = request.user) #queries either user sending or receiving to this specific addressee
-    ).order_by('timestamp') #objects will populate in ascending timestamp order
+    ).order_by('timestamp') #chat messages will populate in ascending timestamp order to show proper history
 
-
-    print(chat_log)
     context = {
         'user_to_message':user_to_message,
         'is_own_profile':is_own_profile,

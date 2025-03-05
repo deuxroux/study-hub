@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('chat/<str:username>', views.chat_with_user, name='chat_with_user'),
 
-    #API routes for debugging
+    #API routes
     path('api/allCourses', api.AllCourses.as_view(), name = 'course_information'),
     path('api/addCourse', api.AddCourse.as_view(), name = 'add_course'),
     path('api/enroll/<int:pk>', api.Enroll, name = 'enrollment'),
