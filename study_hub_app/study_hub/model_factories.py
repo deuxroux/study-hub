@@ -58,7 +58,7 @@ class CourseMaterialFactory(factory.django.DjangoModelFactory):
     course = factory.SubFactory(CourseFactory)
     title =  factory.Faker('sentence', nb_words = 5)   
     uploaded_at = factory.Faker('past_datetime', start_date="-10d") #arbitrary 10 days ago
-    assignment_due_date = factory.Faker('future')  
+    assignment_due_date = factory.Faker('future_date', end_date='+30d')
 
 class ChatMessageFactory(factory.django.DjangoModelFactory):
     class Meta:
