@@ -1,12 +1,11 @@
 from rest_framework import serializers
 from .models import *
 
-#for each model, initialize a serializer class that we can build up on for CRUD operations
+#for each model, initialize a serializer class that can build up on for CRUD operations
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'is_teacher', 'groups', 'user_permissions']
-
 
 class CourseSerializer(serializers.ModelSerializer):
 

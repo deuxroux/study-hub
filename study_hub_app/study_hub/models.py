@@ -16,6 +16,7 @@ class User(AbstractUser):
 
 
     #had to add in order to debug
+    #relates groups to other model entities using ManyToMany field
     groups = models.ManyToManyField(
         Group,
         blank=True,
@@ -31,11 +32,11 @@ class User(AbstractUser):
 
 class Course(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField()
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses_taught')
+    description = models.TextField() #use text field so that we can have multiline inputs on forms-- intends more verboseness
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='courses_taught') #use foreign key designations to connect other tables
     students = models.ManyToManyField(User, through='Enrollment', related_name='courses_enrolled')
     
-    #way to get a course title from outside later
+    #way to get a course title from outside later for debugging
     def __str__(self):
         return self.title
     
@@ -48,7 +49,7 @@ class Enrollment(models.Model):
 
 class Feedback(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,)
-    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null = True)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], null = True) #validator to restrict inputs to 1-5 stars
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     date_posted = models.DateTimeField(auto_now_add=True)
@@ -65,17 +66,17 @@ class CourseMaterial(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     assignment_due_date = models.DateTimeField(null=True, blank=True)
 
-
 class ChatMessage(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    #add code to help debug
+    #add for debugging purposes-- call this to help get details from outside later
     def __str__(self):
         return f"Message from {self.sender.username} to {self.recipient.username} at {self.timestamp}"
 
+#hold databases to manage notifications and trigger based on others-- see receiver decorators below.
 class EnrollmentNotification(models.Model):
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -93,7 +94,7 @@ class NewMaterialNotification(models.Model):
     def __str__(self):
         return f"Notification for new material, alerting: {self.user.username} at {self.timestamp}"
 
-# Notify teacher for student enroll
+# Notify teacher for student enroll. receiver decorater functions like an event trigger from other model occurences
 @receiver(post_save, sender=Enrollment)
 def notify_teacher_on_enrollment(sender, instance, created, **kwargs):
     if created:

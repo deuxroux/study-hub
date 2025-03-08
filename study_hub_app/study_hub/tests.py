@@ -15,6 +15,7 @@ class APICourseViewTest(APITestCase):
         self.course2 = CourseFactory(teacher = self.teacher)
         self.getCourseURL = reverse('course_information')
 
+    #all tearDowns should reset any models that were updated using modelfactories or json posts. 
     def tearDown(self):
          User.objects.all().delete()
          Course.objects.all().delete()
@@ -22,7 +23,6 @@ class APICourseViewTest(APITestCase):
          CourseFactory.reset_sequence(0)
 
     def test_course_details(self):
-        #self.client.force_login(user=self.teacher1)
         #GET request to endpoint and confirm 200 status
         response = self.client.get(self.getCourseURL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -52,18 +52,19 @@ class APICourseMaterialTest(APITestCase):
         #use build method to populate json later without populating database
         course_data = CourseFactory.build(teacher = self.teacher)
 
-        api_json = {
+        #use json payload for data
+        data = {
             'title': course_data.title,
             'description': course_data.description,
             'teacher': course_data.teacher.id
         }
 
-        response = self.client.post(self.addCourseURL, api_json, format = 'json')
+        response = self.client.post(self.addCourseURL, data, format = 'json')
         
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         #confirm that the api payload exists in database
-        self.assertTrue(Course.objects.filter(title=api_json['title'], description=api_json['description'], teacher=self.teacher).exists())
+        self.assertTrue(Course.objects.filter(title=data['title'], description=data['description'], teacher=self.teacher).exists())
 
 class APIGetCourseMaterialTest(APITestCase):
     def setUp(self):
@@ -80,9 +81,11 @@ class APIGetCourseMaterialTest(APITestCase):
         CourseFactory.reset_sequence(0)
 
     def test_view_course_materials(self):
+        #create new course materials based on course setup
         CourseMaterialFactory(course=self.course)
         CourseMaterialFactory(course=self.course)
         response = self.client.get(self.viewMaterialURL)
+        #confirm two courses and appropriate HTTP code passes
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
@@ -106,11 +109,14 @@ class APICourseFeedbackTest(APITestCase):
     def test_post_feedback(self):
         self.client.force_login(user=self.student)
         feedback_data = FeedbackFactory.build(course=self.course, student=self.student)
+        #json below for posting
         data = {
             'rating': feedback_data.rating,
             'content': feedback_data.content
         }
         response = self.client.post(self.postFeedbackURL, data, format='json')
+
+        #confirm creation of feedback-- note we  specifically have a 201 http request we pass through middleware so we can look for that
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(Feedback.objects.filter(course=self.course, student=self.student, content=data['content']).exists())
 
@@ -118,6 +124,8 @@ class APICourseFeedbackTest(APITestCase):
         FeedbackFactory(course=self.course)
         FeedbackFactory(course=self.course)
         response = self.client.get(self.viewFeedbackURL)
+
+        #ensure read operations see 2 entries.
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
@@ -136,15 +144,18 @@ class APIUserStatusTest(APITestCase):
 
     def test_post_status(self):
         self.client.force_login(user=self.user)
+        #api json payload is again tested for appropriate http status and existence in the database
         data = {'content': 'This is a status update.'}
         response = self.client.post(self.postStatusURL, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(StatusUpdate.objects.filter(user=self.user, content=data['content']).exists())
 
     def test_view_status(self):
+        #create status updates to be read
         StatusUpdateFactory(user=self.user)
         StatusUpdateFactory(user=self.user)
         response = self.client.get(self.viewStatusURL)
+        #confirm they can be retriedved correctly
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
@@ -191,7 +202,7 @@ class ViewIndexTest(TestCase):
     def test_logout(self):
         self.client.force_login(self.student)
         response = self.client.get(reverse('logout'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         #confirm logout happens correctly by going back to unauth state
         response = self.client.get(reverse('index'))
         self.assertEqual(response.context.get('role', ''), '')
@@ -199,6 +210,7 @@ class ViewIndexTest(TestCase):
 #chat messages can be sent and recieved
 class ViewChatWithUserTest(TestCase):
     def setUp(self):
+        #create chat messages
         self.user1 = UserFactory(username='user1')
         self.user2 = UserFactory(username='user2')
         ChatMessageFactory(sender=self.user1, recipient=self.user2)
@@ -214,7 +226,7 @@ class ViewChatWithUserTest(TestCase):
         self.client.force_login(self.user1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #confirm message is passed to html
+        #confirm message is passed and in the response that will populate html
         self.assertIn('chat_log', response.context)
         self.assertIn('user_to_message', response.context)
 
@@ -245,6 +257,7 @@ class ViewDeleteNotificationTest(TestCase):
         self.client.force_login(self.student)
         url = reverse('delete_notification', kwargs={'pk': self.material_notif.pk})
         response = self.client.get(url)
+        #confirm that material notifs are found, but this speicifc deleted notification does NOT exist
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertFalse(NewMaterialNotification.objects.filter(pk=self.material_notif.pk).exists())
 
@@ -261,6 +274,7 @@ class ViewCourseCatalogTest(TestCase):
 
     def test_course_catalog(self):
         response = self.client.get(reverse('course_catalog'))
+        #confirm both courses are present, int the response object, and delivering proper status code
         self.assertEqual(response.status_code, 200)
         self.assertIn('courses', response.context)
         self.assertEqual(len(response.context['courses']), 2)
@@ -299,6 +313,7 @@ class LoginTest(TestCase):
         User.objects.all().delete()
 
     def test_invalid_login(self):
+        #edge case,  see if the wrong username/password results in the correct behavior
         loginCredentials = {'username': self.user.username, 'password': '123456'}
         response = self.client.post(reverse('login'), loginCredentials)
         self.assertEqual(response.status_code,  status.HTTP_200_OK) #200 is expected because we're using a catch block to alert the user rather than error out the full page. 
@@ -307,7 +322,7 @@ class LoginTest(TestCase):
     def test_valid_login(self):
         loginCredentials = {'username': self.user.username, 'password': self.password}
         response = self.client.post(reverse('login'), loginCredentials)
-        self.assertEqual(response.status_code, status.HTTP_302_FOUND) #should return a success
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND) #correct credentials should return a success
 
 #confirm that you can enroll in a course
 class ViewEnrollInCourseTest(TestCase):
@@ -347,9 +362,11 @@ class ViewUnenrollFromCourseTest(TestCase):
     def test_unenroll_from_course(self):
         self.client.force_login(self.student1)
         response = self.client.get(self.self_unenroll_url)
+        #confirm that there is no student enrollment after unenrollment but the enrollment details can be found
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertFalse(Enrollment.objects.filter(course=self.course, student=self.student1).exists())
 
+    #test block functionality by teacher in the sameway as self unenrollment, but through a different route
     def test_unenroll_by_teacher(self):
         self.client.force_login(self.teacher)
         response = self.client.get(self.teacher_unenroll_url)
